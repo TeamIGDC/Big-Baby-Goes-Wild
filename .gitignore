@@ -5,6 +5,6 @@ Logs/
 UserSettings/
 Library/
 obj/
-build/
+Build/
 Assembly-CSharp.csproj
 *.htm
