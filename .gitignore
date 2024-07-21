@@ -1,5 +1,8 @@
+.vs/
+.vscode/
 Temp/
 Logs/
 UserSettings/
 Library/
 obj/
+Assembly-CSharp.csproj
