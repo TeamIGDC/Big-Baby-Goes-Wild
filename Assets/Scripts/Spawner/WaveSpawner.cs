@@ -1,63 +1,88 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using Game.Entity;
 
 public class WaveSpawner : MonoBehaviour
 {
-    [SerializeField] WaveContent[] waves;
+    [System.Serializable]
+    public class Difficulty
+    {
+        public string difficultyName;
+        public List<GameObject> enemies; // List of enemy prefabs for this difficulty
+    }
 
-    public int enemiesKilled;
-    
-    int currentWave;
-    float spawnRange = 10f;
+    public List<Difficulty> difficulties; // List of difficulties
+    public Transform[] spawnPoints; // Array of spawn points
+    public ParticleSystem spawnEffect; // Particle effect to play before spawning an enemy
+    public float timeBetweenWaves = 5f; // Time between waves
+    public int maxEnemiesPerWave = 10; // Maximum number of enemies to spawn in each wave
+    public float spawnIntervalMin = 1f; // Minimum interval between spawns
+    public float spawnIntervalMax = 3f; // Maximum interval between spawns
 
-    Vector3 spawnPos;
+    private int currentWaveIndex = 0;
+    private int enemiesSpawned = 0;
+    private bool waveInProgress = false;
+
+    [SerializeField] private UIWaveIndicator _waveIndicatorUI;
 
     void Start()
     {
-        SpawnWave();
+        spawnPoints = GetComponentsInChildren<Transform>();
+        if (spawnPoints.Length == 0)
+        {
+            Debug.LogError("No spawn points referenced.");
+        }
+
+        if (difficulties.Count == 0)
+        {
+            Debug.LogError("No difficulties configured.");
+        }
     }
 
     void Update()
     {
-        if(enemiesKilled >= waves[currentWave].GetWaveSpawnList().Length)
+        if (!waveInProgress && currentWaveIndex < difficulties.Count)
         {
-            enemiesKilled = 0;
-            currentWave++;
-            SpawnWave();
+            _waveIndicatorUI.TriggerWaveChange(currentWaveIndex);
+            StartCoroutine(StartWave(difficulties[currentWaveIndex]));
         }
     }
 
-    void SpawnWave()
+    IEnumerator StartWave(Difficulty difficulty)
     {
-        for(int i = 0; i < waves[currentWave].GetWaveSpawnList().Length; i++)
+        waveInProgress = true;
+        enemiesSpawned = 0;
+
+        while (enemiesSpawned < maxEnemiesPerWave)
         {
-            Instantiate(waves[currentWave].GetWaveSpawnList()[i], FindSpawnLoc(), Quaternion.identity);
+            float spawnInterval = Random.Range(spawnIntervalMin, spawnIntervalMax);
+            yield return new WaitForSeconds(spawnInterval);
+
+            SpawnEnemy(difficulty.enemies[Random.Range(0, difficulty.enemies.Count)]);
+            enemiesSpawned++;
         }
+
+        yield return new WaitForSeconds(timeBetweenWaves);
+
+        waveInProgress = false;
+        currentWaveIndex++;
     }
 
-    Vector3 FindSpawnLoc()
+    void SpawnEnemy(GameObject enemy)
     {
-        float xLoc = Random.Range(-spawnRange, spawnRange) + transform.position.x;
-        float zLoc = Random.Range(-spawnRange, spawnRange) + transform.position.z;
-        float yLoc = transform.position.y;
-
-        spawnPos =  new Vector3(xLoc, yLoc, zLoc);
-
-        if(Physics.Raycast(spawnPos, Vector3.down, 5f))
-        {
-            return spawnPos;
-        } else {
-            return FindSpawnLoc();
-        }
+        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        StartCoroutine(SpawnEnemyWithEffect(enemy, spawnPoint));
     }
-}
 
-[System.Serializable]
-public class WaveContent
-{
-    public GameObject[] waveSpawners;
-
-    public GameObject[] GetWaveSpawnList()
+    IEnumerator SpawnEnemyWithEffect(GameObject enemy, Transform spawnPoint)
     {
-        return waveSpawners;
+        ParticleSystem effect = Instantiate(spawnEffect, spawnPoint.position, Quaternion.identity);
+        effect.Play();
+        yield return new WaitForSeconds(effect.main.duration);
+        Destroy(effect.gameObject);
+
+        Instantiate(enemy, spawnPoint.position, spawnPoint.rotation);
     }
 }

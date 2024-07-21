@@ -5,8 +5,9 @@ namespace Game.Inputsystem
 {
     public class PlayerInput : MonoBehaviour
     {
+        private bool _canInput = true;
         public enum PlayerMovementInputStateEnum { Idle, Moving }
-        public enum PlayerAttackInputStateEnum { NotAttacking, ShortAttacking, LongAttacking }
+        public enum PlayerAttackInputStateEnum { NotAttacking, ShortAttacking }
 
         public PlayerMovementInputStateEnum PlayerMovementInputState { get; private set; }
         public PlayerAttackInputStateEnum PlayerAttackInputState { get; private set; }
@@ -14,20 +15,28 @@ namespace Game.Inputsystem
         public UnityEvent<Vector3> OnMoveInput = new UnityEvent<Vector3>();
         public UnityEvent<Vector3> OnMousePosition = new UnityEvent<Vector3>();
         public UnityEvent OnShortAttack = new UnityEvent();
-        public UnityEvent OnLongAttack = new UnityEvent();
         public UnityEvent OnInputStateChange = new UnityEvent();
+
 
         private void Update()
         {
-            HandleMoveInput();
-            HandleMouseInput();
-            HandleAttackInput();
+            if(_canInput)
+            {
+                HandleMoveInput();
+                HandleMouseInput();
+                HandleAttackInput();
+            }
         }
 
         public void SetPlayerAttackState(PlayerAttackInputStateEnum state)
         {
             PlayerAttackInputState = state;
             OnInputStateChange.Invoke();
+        }
+
+        public void SetCanInput(bool val)
+        {
+            _canInput = val;
         }
 
         void HandleMoveInput()
@@ -63,15 +72,10 @@ namespace Game.Inputsystem
         {
             if (PlayerAttackInputState == PlayerAttackInputStateEnum.NotAttacking)
             {
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButton(0))
                 {
                     SetPlayerAttackState(PlayerAttackInputStateEnum.ShortAttacking);
                     OnShortAttack.Invoke();
-                }
-                else if (Input.GetMouseButtonDown(1))
-                {
-                    SetPlayerAttackState(PlayerAttackInputStateEnum.LongAttacking);
-                    OnLongAttack.Invoke();
                 }
             }
         } 

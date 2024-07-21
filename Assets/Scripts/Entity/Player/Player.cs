@@ -10,6 +10,9 @@ namespace Game.Entity
         private Camera _camera; // Reference to the Camera
         private Animator _animator;
         [SerializeField] private PlayerInput _playerInput;
+        [SerializeField] private LayerMask _hitLayerMask;
+        [SerializeField] private float shortAttackRange = 1f; // Define appropriate attack range
+        [SerializeField] private int shortAttackDamage = 10; // Define appropriate damage
 
         private bool _canMove = true;
 
@@ -31,16 +34,17 @@ namespace Game.Entity
             _playerInput.OnMoveInput.AddListener(Move);
             _playerInput.OnMousePosition.AddListener(RotateTowardsMouse);
             _playerInput.OnShortAttack.AddListener(ShortAttack);
-            _playerInput.OnLongAttack.AddListener(LongAttack);
-            _playerInput.OnInputStateChange.AddListener(PlayAnimations);
+            _playerInput.OnInputStateChange.AddListener(PlayAliveAnimations);
+            OnEntityStatusChange.AddListener(Die);
         }
 
         void Update()
         {
-            PlayAnimations();
+            if (_entityStatus == EntityStatus.Alive)
+                PlayAliveAnimations();
         }
 
-        void PlayAnimations()
+        void PlayAliveAnimations()
         {
             if (_playerInput.PlayerAttackInputState == PlayerInput.PlayerAttackInputStateEnum.NotAttacking)
             {
@@ -56,17 +60,20 @@ namespace Game.Entity
             }
             else
             {
-                switch (_playerInput.PlayerAttackInputState)
+                if (_playerInput.PlayerAttackInputState == PlayerInput.PlayerAttackInputStateEnum.ShortAttacking)
                 {
-                    case PlayerInput.PlayerAttackInputStateEnum.ShortAttacking:
-                        _animator.Play("slash");
-                        StartCoroutine(ResetAttackStateAfterAnimation());
-                        break;
-                    case PlayerInput.PlayerAttackInputStateEnum.LongAttacking:
-                        _animator.Play("casting");
-                        StartCoroutine(ResetAttackStateAfterAnimation());
-                        break;
+                    _animator.Play("slash");
+                    StartCoroutine(ResetAttackStateAfterAnimation());
                 }
+            }
+        }
+
+        void Die(EntityStatus status)
+        {
+            if (status == EntityStatus.Dead)
+            {
+                _playerInput.SetCanInput(false);
+                _animator.Play("die");
             }
         }
 
@@ -93,28 +100,51 @@ namespace Game.Entity
             if (_playerInput.PlayerAttackInputState == PlayerInput.PlayerAttackInputStateEnum.NotAttacking)
             {
                 _playerInput.SetPlayerAttackState(PlayerInput.PlayerAttackInputStateEnum.ShortAttacking);
-                _animator.Play("slash");
-                StartCoroutine(ResetAttackStateAfterAnimation());
-            }
-        }
-
-        void LongAttack()
-        {
-            if (_playerInput.PlayerAttackInputState == PlayerInput.PlayerAttackInputStateEnum.NotAttacking)
-            {
-                _playerInput.SetPlayerAttackState(PlayerInput.PlayerAttackInputStateEnum.LongAttacking);
-                _animator.Play("casting");
                 StartCoroutine(ResetAttackStateAfterAnimation());
             }
         }
 
         private IEnumerator ResetAttackStateAfterAnimation()
         {
+            _animator.Play("slash");
             while (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f || _animator.IsInTransition(0))
             {
                 yield return null;
             }
+            CheckForEnemiesAndDealDamage(shortAttackRange, shortAttackDamage);
             _playerInput.SetPlayerAttackState(PlayerInput.PlayerAttackInputStateEnum.NotAttacking);
+        }
+
+        void CheckForEnemiesAndDealDamage(float attackRange, int attackDamage)
+        {
+            Debug.Log($"Performing attack check with range: {attackRange} and damage: {attackDamage}");
+
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange, _hitLayerMask);
+            Debug.Log($"Number of colliders detected: {hitColliders.Length}");
+
+            foreach (var hitCollider in hitColliders)
+            {
+                Debug.Log($"Detected: {hitCollider.name}");
+
+                Entity enemy = hitCollider.GetComponent<Entity>();
+                if (enemy != null)
+                {
+                    Debug.Log($"Enemy found: {enemy.gameObject.name}");
+                    if (enemy.GEntityStatus == EntityStatus.Alive)
+                    {
+                        Debug.Log($"Damaging enemy: {enemy.gameObject.name}");
+                        enemy.TakeDamage(attackDamage);
+                    }
+                    else
+                    {
+                        Debug.Log($"Enemy not alive: {enemy.gameObject.name}");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"No Entity component found on: {hitCollider.name}");
+                }
+            }
         }
 
         private void OnDestroy()
@@ -122,8 +152,8 @@ namespace Game.Entity
             _playerInput.OnMoveInput.RemoveListener(Move);
             _playerInput.OnMousePosition.RemoveListener(RotateTowardsMouse);
             _playerInput.OnShortAttack.RemoveListener(ShortAttack);
-            _playerInput.OnLongAttack.RemoveListener(LongAttack);
-            _playerInput.OnInputStateChange.RemoveListener(PlayAnimations);
+            _playerInput.OnInputStateChange.RemoveListener(PlayAliveAnimations);
+            OnEntityStatusChange.RemoveListener(Die);
         }
     }
 }
