@@ -6,3 +6,4 @@ UserSettings/
 Library/
 obj/
 Assembly-CSharp.csproj
+*.htm
