@@ -6,7 +6,7 @@ public class LightingManager : MonoBehaviour
     [SerializeField] Light directonalLight;
     [SerializeField] LightingPreset preset;
 
-    [SerializeField, Range(0, 24)] float timeOfDay;
+    [Range(0, 24)] public float timeOfDay;
 
     void Update()
     {
