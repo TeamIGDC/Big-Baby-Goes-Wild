@@ -1,16 +1,22 @@
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+namespace Game.Inputsystem
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    public class InputManager : MonoBehaviour
     {
-        
+        // Start is called before the first frame update
+        void Start()
+        {
+            
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            
+        }
     }
+    
 }
+
