@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,8 +6,11 @@ namespace Game.Entity
     public abstract class Entity : MonoBehaviour, IDamage
     {
         [SerializeField] protected float _speed;
-        [SerializeField] protected float _health;
+        public float _health;
         [HideInInspector] public UnityEvent<float> OnHealthChange;
+
+        [HideInInspector] Health h;        
+
         public enum EntityStatus 
         {
             Alive,
@@ -23,6 +24,7 @@ namespace Game.Entity
         protected void Start()
         {
             _entityStatus = EntityStatus.Alive;
+            h = FindObjectOfType<Health>();
         }
 
         public void ChangeEntityState(EntityStatus state)
@@ -34,6 +36,7 @@ namespace Game.Entity
         public void TakeDamage(int damageAmount)
         {
             _health -= damageAmount;
+            h.health = (int)_health;
             Mathf.Clamp(_health,0,100);
             OnHealthChange.Invoke(_health);
             if (_health <= 0)

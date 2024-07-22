@@ -40,8 +40,7 @@ namespace Game.Entity
 
         void Update()
         {
-            if (_entityStatus == EntityStatus.Alive)
-                PlayAliveAnimations();
+            if (_entityStatus == EntityStatus.Alive) PlayAliveAnimations();
         }
 
         void PlayAliveAnimations()

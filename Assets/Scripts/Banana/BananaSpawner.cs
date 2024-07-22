@@ -3,7 +3,7 @@ using UnityEngine;
 public class BananaSpawner : MonoBehaviour
 {
     [SerializeField] GameObject banana;
-    [SerializeField] GameObject spawnPoint;
+    [SerializeField] GameObject[] spawnPoints;
 
     [SerializeField] LightingManager lightningManager;
 
@@ -13,7 +13,7 @@ public class BananaSpawner : MonoBehaviour
     {
         if(lightningManager.timeOfDay >= 7f && lightningManager.timeOfDay <= 13f && !isSpawned)
         {
-            Instantiate(banana, spawnPoint.transform.position, Quaternion.identity);
+            Instantiate(banana, spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position, Quaternion.identity);
             isSpawned = true;
         }
 

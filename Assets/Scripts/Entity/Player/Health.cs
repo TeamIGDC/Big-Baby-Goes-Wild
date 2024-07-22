@@ -1,15 +1,24 @@
+using Game.Entity;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public int health;
+    public float health;
 
     void Update()
     {
+        /*
         if(health<=0)
         {
             Debug.Log("I am dead, boi :(");
             Destroy(gameObject);
+        }
+        */
+        if(health > 0f)
+        {
+            Player player = gameObject.GetComponent<Player>();
+            player._health += health;
+            health = 0f;
         }
     }
 
@@ -18,7 +27,7 @@ public class Health : MonoBehaviour
         if(collider.CompareTag("banana"))
         {
             Debug.Log("yummy banana");
-            health += 10;
+            health += 10f;
             collider.GetComponent<Banana>().RemoveBanana();
         }
     }
