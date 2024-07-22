@@ -6,5 +6,5 @@ UserSettings/
 Library/
 obj/
 Build/
-Assembly-CSharp.csproj
+*.csproj
 *.htm
