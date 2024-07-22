@@ -1,4 +1,4 @@
-# Big Baby Goes Wild
+# Big Baby Goes Wild (CODENAME: Project Athena)
 
 Big Baby Goes Wild is a game @demonkingswarn and @RaghavGohil developed for [**WTF x IGDC Game Jam**](https://lu.ma/pq0vla0p).
 
