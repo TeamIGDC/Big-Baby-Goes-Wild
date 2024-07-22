@@ -21,9 +21,6 @@ It's not the best way to play the game, and more intended for development and mo
 
 Feel free to submit pull requests to the game. If merged, they will be shipped in the next release of Big Baby Goes Wild. For more info see the `CONTRIBUTING.md` and `LICENSE` files in the repo root.
 
-> [!NOTE]
-> All contributions must sign the Developer Certificate of Origin before any pull requests are merged. More information is in `/CONTRIBUTING.md`.
-
 ## Project structure
 - All game scripts are in `Scripts`
 - Scenes are in `Scenes`. The game's entry-point is `Scenes/Game.unity`
