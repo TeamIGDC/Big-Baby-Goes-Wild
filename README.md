@@ -14,12 +14,12 @@ It's not the best way to play the game, and more intended for development and mo
 4. Navigate to `Assets/Scenes` in the asset browser, and open the `Game` scene.
 5. Hit Play at the top and hurry up and wait, while it builds asset bundles the first time.
 
-> [!NOTE]
-> `master` branch has the older version of the game, the latest build of the game is in `devel` branch.
-
 ## Accepting contributions!
 
 Feel free to submit pull requests to the game. If merged, they will be shipped in the next release of Big Baby Goes Wild. For more info see the `CONTRIBUTING.md` and `LICENSE` files in the repo root.
+
+> [!NOTE]
+> All contributions must sign the Developer Certificate of Origin before any pull requests are merged. More information is in `/CONTRIBUTING.md`.
 
 ## Project structure
 - All game scripts are in `Scripts`
