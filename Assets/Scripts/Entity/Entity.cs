@@ -6,10 +6,8 @@ namespace Game.Entity
     public abstract class Entity : MonoBehaviour, IDamage
     {
         [SerializeField] protected float _speed;
-        public float _health;
-        [HideInInspector] public UnityEvent<float> OnHealthChange;
-
-        [HideInInspector] Health h;        
+        public int _health;
+        [HideInInspector] public UnityEvent<float> OnHealthChange;     
 
         public enum EntityStatus 
         {
@@ -24,7 +22,6 @@ namespace Game.Entity
         protected void Start()
         {
             _entityStatus = EntityStatus.Alive;
-            h = FindObjectOfType<Health>();
         }
 
         public void ChangeEntityState(EntityStatus state)
@@ -36,7 +33,6 @@ namespace Game.Entity
         public void TakeDamage(int damageAmount)
         {
             _health -= damageAmount;
-            h.health = (int)_health;
             Mathf.Clamp(_health,0,100);
             OnHealthChange.Invoke(_health);
             if (_health <= 0)
